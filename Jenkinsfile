@@ -39,13 +39,14 @@ pipeline{
 
                 script{
                     
-                    def SonarQubecredentialsId = 'sonar-api'
-                    staticcodeanalysis1(SonarQubecredentialsId)
-
+                    def scannerHome = tool 'sonar-api1';
+                    withSonarQubeEnv() {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
-        }
-        stage('QualityCheckStatus : soanr'){
+        }                    
+        stage('QualityCheckStatus : sonar'){
 
         when { expression  { params.action == 'create' } }
             
