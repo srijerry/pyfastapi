@@ -26,34 +26,8 @@ pipeline{
                 script{
                 gitCheckout(
                     branch: "main",
-                    url: "https://github.com/srijerry/java-app.git"
+                    url: "https://github.com/srijerry/pyfastapi.git"
                 )
-                }
-            }
-        }
-        stage('unit test maven'){
-
-        when { expression  { params.action == 'create' } }
-            
-            steps{
-
-                script{
-
-                    mvntest()
-
-                }
-            }
-        }
-        stage('intergartion test maven'){
-
-        when { expression  { params.action == 'create' } }
-            
-            steps{
-
-                script{
-
-                    mavenintegrationtest()
-
                 }
             }
         }
@@ -81,19 +55,6 @@ pipeline{
                     
                     def SonarQubecredentialsId = 'sonar-api'
                     QualityCheckStatus(SonarQubecredentialsId)
-
-                }
-            }
-        }
-        stage('maven Build'){
-
-        when { expression  { params.action == 'create' } }
-            
-            steps{
-
-                script{
-
-                    mvnBuild()
 
                 }
             }
