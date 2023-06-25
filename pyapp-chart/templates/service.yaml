@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.pyapp.service.name }}
+spec:
+  selector:
+    app: {{ .Values.pyapp.name }}
+  ports:
+  {{- toYaml .Values.pyapp.service.ports | nindent 4 }}
+  type: {{ .Values.pyapp.service.type }}

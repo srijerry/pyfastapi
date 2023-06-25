@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.pyapp.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.pyapp.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.pyapp.name }}
+    spec:
+      containers:
+      - name: {{ .Values.pyapp.name }}
+        image: "{{ .Values.pyapp.image.repository }}:{{ .Values.pyapp.image.tag | default .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{ .Values.pyapp.containerPort }}

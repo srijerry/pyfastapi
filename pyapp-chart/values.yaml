@@ -1,0 +1,29 @@
+
+pyapp:
+  
+  name: pyapp
+
+  labels: 
+     app: uwsgi
+
+  image:
+    repository: 982210731409.dkr.ecr.us-east-2.amazonaws.com/pyapp
+    tag: ""
+    pullPolicy: Always
+
+  containerPort: 8090
+ 
+
+  service:
+    type: LoadBalancer
+    name: py-app-service
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 8090
+      
+  strategy: {}
+
+
+
+
