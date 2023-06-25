@@ -1,7 +1,7 @@
     on:
       push:
         branches:         
-        - 'stage'
+        - 'main'
 
     name: Stage pipeline for divy application
 
@@ -13,29 +13,34 @@
           AWS_REGION: us-east-2
           CLUSTER_NAME: test
           NAMESPACE : test1
-          IMAGE_REPO: 735362266271.dkr.ecr.us-east-2.amazonaws.com
-          IMAGE_NAME: divy-backend
+          IMAGE_REPO: 982210731409.dkr.ecr.us-east-2.amazonaws.com
+          IMAGE_NAME: pyapp
           IMAGE_TAG: 1.0.${{ github.run_number }}
-          CHART_NAME: divy-backend-chart
+#          CHART_NAME: 
 
         steps:
           - uses: actions/checkout@v2
 
-          - name: Set git ssh private key
-            run: echo "${{ secrets.GIT_KEY }}" > GIT-KEY
+          - name: SonarQube Scan
+            uses: kitabisa/sonarqube-action@v1.2.0
+            with:
+              host: ${{ secrets.SONARQUBE_HOST }}
+              login: ${{ secrets.SONARQUBE_TOKEN }}
+              projectKey: "pyfastapi"
+
 
           - name: AWS Credentials
             uses: aws-actions/configure-aws-credentials@v1
             with:
               aws-region: ${{ env.AWS_REGION }}
-              aws-access-key-id: ${{ secrets.AWS_STAGE_ACCESS_ID }}
-              aws-secret-access-key: ${{ secrets.AWS_STAGE_SECRET_ID }}
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ID }}
               
           - name: EKS connect
             run:  aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-          - name: Login to Docker
-            run: docker login -u "${{ secrets.ARTIFACTORY_USERNAME }}" -p "${{ secrets.ARTIFACTORY_PASSWORD }}" artifactory.accuknox.com 
+          # - name: Login to Docker
+          #   run: docker login -u "${{ secrets.ARTIFACTORY_USERNAME }}" -p "${{ secrets.ARTIFACTORY_PASSWORD }}" artifactory.accuknox.com 
           
           - name: Build the Docker image
             run: docker build -f Dockerfile . --tag ${{ env.IMAGE_REPO }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
@@ -48,13 +53,13 @@
               severity: HIGH,CRITICAL
               exit-code: 0
 
-          - name: Publish report to S3 
-            uses: prewk/s3-cp-action@v2  
-            with:
-              aws_access_key_id: ${{ secrets.AWS_STAGE_ACCESS_ID }}
-              aws_secret_access_key: ${{ secrets.AWS_STAGE_SECRET_ID }}
-              source: ./trivy-results
-              dest: s3://accuknox-stage-trivy-reports/${{ env.IMAGE_NAME }}/trivy-results-${{ env.IMAGE_TAG }}
+          # - name: Publish report to S3 
+          #   uses: prewk/s3-cp-action@v2  
+          #   with:
+          #     aws_access_key_id: ${{ secrets.AWS_STAGE_ACCESS_ID }}
+          #     aws_secret_access_key: ${{ secrets.AWS_STAGE_SECRET_ID }}
+          #     source: ./trivy-results
+          #     dest: s3://-stage-trivy-reports/${{ env.IMAGE_NAME }}/trivy-results-${{ env.IMAGE_TAG }}
 
           - name: Login to Amazon ECR
             id: login-ecr
@@ -64,14 +69,14 @@
             run: |
               docker push ${{ env.IMAGE_REPO }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-          - name: Helm Build
-            run: |
-              sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
-              cat ${{ env.CHART_NAME }}/Chart.yaml
-              helm lint ${{ env.CHART_NAME }} 
-              helm package ${{ env.CHART_NAME }}
-              pwd
+          # - name: Helm Build
+          #   run: |
+          #     sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
+          #     cat ${{ env.CHART_NAME }}/Chart.yaml
+          #     helm lint ${{ env.CHART_NAME }} 
+          #     helm package ${{ env.CHART_NAME }}
+          #     pwd
 
 
-          - name: Helm Install
-            run: helm upgrade --install divy-backend ${{ env.CHART_NAME }} -n ${{ env.NAMESPACE }} --values=${{ env.CHART_NAME }}/values-stage.yaml
+          # - name: Helm Install
+          #   run: helm upgrade --install divy-backend ${{ env.CHART_NAME }} -n ${{ env.NAMESPACE }} --values=${{ env.CHART_NAME }}/values-stage.yaml
