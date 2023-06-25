@@ -112,7 +112,7 @@ pipeline{
 
                 script{
 
-                    ECRpush("${JOB_NAME}","${BUILD_NUMBER}","${params.awsaccount}","${params.region}","${ACCESS_KEY}","${SECRET_KEY}")
+                    ECRpush("${JOB_NAME}","${BUILD_NUMBER}","${params.awsaccount}","${params.region}",'$ACCESS_KEY','$SECRET_KEY')
 
                 }
             }
