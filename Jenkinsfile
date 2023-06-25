@@ -14,6 +14,11 @@ pipeline{
         string(name: 'region', description: "AWS account ID", defaultValue: 'us-east-2')
         
     }
+    environment{
+
+        ACCESS_KEY = credentials('AWS_ACCESS_KEY_ID')
+        SECRET_KEY = credentials('AWS_SECRET_KEY_ID')
+    }
 
     stages{
 
@@ -107,7 +112,7 @@ pipeline{
 
                 script{
 
-                    ECRpush("${JOB_NAME}","${BUILD_NUMBER}","${params.awsaccount}","${params.region}")
+                    ECRpush("${JOB_NAME}","${BUILD_NUMBER}","${params.awsaccount}","${params.region}","${ACCESS_KEY}",${SECRET_KEY})
 
                 }
             }
