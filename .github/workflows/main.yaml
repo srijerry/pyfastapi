@@ -40,17 +40,6 @@
           - name: "Example show SonarQube Quality Gate Status value"
             run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
 
-
-          - name: AWS Credentials
-            uses: aws-actions/configure-aws-credentials@v1
-            with:
-              aws-region: ${{ env.AWS_REGION }}
-              aws-access-key-id: ${{ secrets.AWS_ACCESS_ID }}
-              aws-secret-access-key: ${{ secrets.AWS_SECRET_ID }}
-              
-          - name: EKS connect
-            run:  aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-
           # - name: Login to Docker
           #   run: docker login -u "${{ secrets.ARTIFACTORY_USERNAME }}" -p "${{ secrets.ARTIFACTORY_PASSWORD }}" artifactory..com 
           
@@ -72,6 +61,16 @@
           #     aws_secret_access_key: ${{ secrets.AWS_STAGE_SECRET_ID }}
           #     source: ./trivy-results
           #     dest: s3://-stage-trivy-reports/${{ env.IMAGE_NAME }}/trivy-results-${{ env.IMAGE_TAG }}
+          
+          - name: AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+              aws-region: ${{ env.AWS_REGION }}
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ID }}
+              
+          - name: EKS connect
+            run:  aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
           - name: Login to Amazon ECR
             id: login-ecr
@@ -86,13 +85,13 @@
               kubectl apply -f ./manifest/deployment.yaml
               kubectl apply -f ./manifest/service.yaml
 
-          - name: Helm Build
-            run: |
-              sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
-              cat ${{ env.CHART_NAME }}/Chart.yaml
-              helm lint ${{ env.CHART_NAME }} 
-              helm package ${{ env.CHART_NAME }}
-              pwd
+          # - name: Helm Build
+          #   run: |
+          #     sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
+          #     cat ${{ env.CHART_NAME }}/Chart.yaml
+          #     helm lint ${{ env.CHART_NAME }} 
+          #     helm package ${{ env.CHART_NAME }}
+          #     pwd
 
 
           # - name: Helm Install
