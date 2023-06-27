@@ -82,16 +82,16 @@
 
           - name: deploy to kubernetes
             run: |
-              kubectl apply -f ./manifest/deployment.yaml
-              kubectl apply -f ./manifest/service.yaml
+              kubectl apply -f ./yamls/deployment.yaml
+              kubectl apply -f ./yamls/service.yaml
 
-          # - name: Helm Build
-          #   run: |
-          #     sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
-          #     cat ${{ env.CHART_NAME }}/Chart.yaml
-          #     helm lint ${{ env.CHART_NAME }} 
-          #     helm package ${{ env.CHART_NAME }}
-          #     pwd
+          - name: Helm Build
+            run: |
+              sed -i "/^\([[:space:]]*appVersion: \).*/s//\1${{ env.IMAGE_TAG }}/" ${{ env.CHART_NAME }}/Chart.yaml
+              cat ${{ env.CHART_NAME }}/Chart.yaml
+              helm lint ${{ env.CHART_NAME }} 
+              helm package ${{ env.CHART_NAME }}
+              pwd
 
 
           # - name: Helm Install
