@@ -104,7 +104,7 @@ pipeline{
                 }
             }
         }  
-        stage('ecr push'){
+        stage('ecr push1'){
 
         when { expression  { params.action == 'create' } }
             
