@@ -14,5 +14,13 @@ spec:
     spec:
       containers:
       - name: pyapp1
+        image: 982210731409.dkr.ecr.us-east-2.amazonaws.com/pyapp
         ports:
         - containerPort: 8090
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "250m"
+          limits:
+            memory: "500Mi"
+            cpu: "250m"
