@@ -112,6 +112,24 @@ pipeline{
 
                 script{
 
+                    sh """
+                    aws configure set aws_access_key_id $ACCESS_KEY
+                    aws configure set aws_secret_access_key $SECRET_KEY
+                    aws configure set region ${params.region}
+                    aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 982210731409.dkr.ecr.us-east-2.amazonaws.com
+                    """
+
+                }
+            }
+        }
+        stage('ecr push'){
+
+        when { expression  { params.action == 'create' } }
+            
+            steps{
+
+                script{
+
                     ECRpush("${JOB_NAME}","${BUILD_NUMBER}","${params.awsaccount}","${params.region}",'$ACCESS_KEY','$SECRET_KEY')
 
                 }
